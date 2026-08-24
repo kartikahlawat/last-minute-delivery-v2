@@ -1,4 +1,4 @@
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { prisma } from '../config/db';
 import { AuthenticatedRequest } from '../middleware/authGuard';
 import { calculateQuote, RateCardRule, CodConfigRule } from '../services/rateEngine';
@@ -48,9 +48,9 @@ export async function getQuote(req: AuthenticatedRequest, res: Response) {
     // 3. Fetch COD Surcharge Config
     let codConfig: CodConfigRule | null = null;
     if (paymentType === 'COD') {
-      codConfig = await prisma.codSurchargeConfig.findFirst({
+      codConfig = (await prisma.codSurchargeConfig.findFirst({
         where: { orderType, isActive: true },
-      });
+      })) as CodConfigRule | null;
     }
 
     // 4. Pure Engine Calculation
@@ -121,7 +121,9 @@ export async function createOrder(req: AuthenticatedRequest, res: Response) {
 
     let codConfig: CodConfigRule | null = null;
     if (paymentType === 'COD') {
-      codConfig = await prisma.codSurchargeConfig.findFirst({ where: { orderType, isActive: true } });
+      codConfig = (await prisma.codSurchargeConfig.findFirst({
+        where: { orderType, isActive: true },
+      })) as CodConfigRule | null;
     }
 
     const quote = calculateQuote(
