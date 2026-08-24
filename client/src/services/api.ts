@@ -6,7 +6,8 @@ const getBaseURL = () => {
     const cleanUrl = envUrl.replace(/\/+$/, '');
     return cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`;
   }
-  return '/api';
+  // Production default fallback to live Render backend
+  return 'https://last-minute-delivery-v2.onrender.com/api';
 };
 
 const API = axios.create({
